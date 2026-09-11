@@ -71,6 +71,13 @@ async function solicitarAPI(endpoint, accion, datos = {}) {
     return resultado.data;
 }
 
+function ordenarCategorias(lista = null) {
+    const arr = Array.isArray(lista) ? [...lista] : [...(DB.categorias || [])];
+    return arr.sort((a, b) => 
+        (a.nombre || '').trim().localeCompare((b.nombre || '').trim(), 'es', { sensitivity: 'base', numeric: true })
+    );
+}
+
 async function cargarDBDesdeAPI() {
     const [categorias, productos, proveedores, comprasStock, ventas, usuarios] = await Promise.all([
         solicitarAPI('categorias', 'listar'),
@@ -83,7 +90,7 @@ async function cargarDBDesdeAPI() {
 
     DB = obtenerDB();
     DB.usuarios = usuarios || DB.usuarios;
-    DB.categorias = categorias || [];
+    DB.categorias = ordenarCategorias(categorias || []);
     DB.productos = (productos || []).map(producto => ({
         ...producto,
         id: Number(producto.id),
@@ -575,8 +582,9 @@ function abrirModalProducto(esEditar = false) {
 
     if (!modal) return;
 
-    // Cargar select de categorías
+    // Cargar select de categorías en orden alfabético
     DB = obtenerDB();
+    DB.categorias = ordenarCategorias(DB.categorias);
     let optionsCat = '<option value="">-- Seleccionar Categoría --</option>';
     DB.categorias.forEach(c => {
         optionsCat += `<option value="${c.id}">${c.nombre}</option>`;
@@ -663,6 +671,7 @@ async function eliminarProductoAdmin(id) {
 // Categorías Admin
 function renderCategoriasAdmin() {
     DB = obtenerDB();
+    DB.categorias = ordenarCategorias(DB.categorias);
     const contenedor = document.getElementById('gridCategoriasAdmin');
     if (!contenedor) return;
 
@@ -719,8 +728,11 @@ document.getElementById('formEditarCategoriaAdmin')?.addEventListener('submit', 
     try {
         await solicitarAPI('categorias', 'editar', { id, nombre, descripcion });
         await cargarDBDesdeAPI();
+        DB.categorias = ordenarCategorias(DB.categorias);
         cerrarModalCategoriaAdmin();
         mostrarNotificacion('Categoría actualizada correctamente.', 'exito');
+        renderCategoriasAdmin();
+        renderCategoriasLanding();
         setTimeout(() => { window.location.href = 'admin.html#categorias'; }, 700);
     } catch (error) {
         mostrarNotificacion(error.message, 'error');
@@ -737,10 +749,12 @@ document.getElementById('formCategoriaAdmin')?.addEventListener('submit', async 
     try {
         await solicitarAPI('categorias', 'crear', { nombre, descripcion: desc });
         await cargarDBDesdeAPI();
+        DB.categorias = ordenarCategorias(DB.categorias);
         mostrarNotificacion('Nueva categoría creada con éxito.', 'exito');
         this.reset();
         renderCategoriasAdmin();
         cargarFiltrosCliente();
+        renderCategoriasLanding();
         setTimeout(() => {
             window.location.href = 'admin.html#categorias';
         }, 700);
@@ -754,9 +768,11 @@ async function eliminarCategoriaAdmin(id) {
         try {
             await solicitarAPI('categorias', 'eliminar', { id });
             await cargarDBDesdeAPI();
+            DB.categorias = ordenarCategorias(DB.categorias);
             mostrarNotificacion('Categoría eliminada.', 'exito');
             renderCategoriasAdmin();
             cargarFiltrosCliente();
+            renderCategoriasLanding();
         } catch (error) {
             mostrarNotificacion(error.message, 'error');
         }
@@ -1006,6 +1022,7 @@ function inicializarCliente() {
 
 function cargarFiltrosCliente() {
     DB = obtenerDB();
+    DB.categorias = ordenarCategorias(DB.categorias);
     const selectCat = document.getElementById('filtroCatCliente');
     if (!selectCat) return;
 
@@ -1020,7 +1037,8 @@ let categoriaLandingActual = '';
 
 function renderCategoriasLanding() {
     DB = obtenerDB();
-    const categorias = Array.isArray(DB.categorias) ? DB.categorias : [];
+    DB.categorias = ordenarCategorias(DB.categorias);
+    const categorias = DB.categorias;
     const sidebar = document.getElementById('categoriasLandingDinamicas');
     const nav = document.getElementById('navCategoriasLanding');
 

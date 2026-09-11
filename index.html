@@ -56,8 +56,11 @@
         <div class="ruta-tienda"><a href="#">Inicio</a><span>/</span><strong>Productos tecnológicos</strong></div>
         <section class="catalogo-home" id="catalogoHome">
             <aside class="filtros-home">
-                <div class="filtros-titulo">
+                <div class="filtros-titulo" style="display:flex; justify-content:space-between; align-items:center;">
                     <h2>Categorías</h2>
+                    <span style="font-size:11px; font-weight:600; color:var(--text-muted); display:inline-flex; align-items:center; gap:4px; background:#f1f5f9; padding:3px 8px; border-radius:12px; border:1px solid var(--border-color);" title="Categorías ordenadas alfabéticamente de la A a la Z">
+                        <i class="fa-solid fa-arrow-down-a-z"></i> A-Z
+                    </span>
                 </div>
                 <button class="filtro-categoria activo" data-categoria=""
                     onclick="seleccionarCategoriaLanding('')">Todos los productos <span

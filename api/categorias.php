@@ -15,7 +15,7 @@ switch ($action) {
                 FROM categorias c 
                 LEFT JOIN productos p ON c.id = p.categoria_id 
                 GROUP BY c.id 
-                ORDER BY c.id ASC";
+                ORDER BY c.nombre ASC";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
         $categorias = $stmt->fetchAll();
