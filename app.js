@@ -308,6 +308,36 @@ function cerrarSesion() {
 // LÓGICA DEL PANEL ADMINISTRADOR (admin.html)
 // ==========================================
 
+const UMBRAL_STOCK_BAJO = 3;
+let filtroStockBajoActivo = false;
+
+function alternarFiltroStockBajo() {
+    filtroStockBajoActivo = !filtroStockBajoActivo;
+    const inputBuscar = document.getElementById('inputBuscarAdmin');
+    const valorBusqueda = inputBuscar ? inputBuscar.value : '';
+    renderTablaProductosAdmin(valorBusqueda);
+
+    if (filtroStockBajoActivo) {
+        const cant = DB.productos.filter(p => Number(p.stock) <= UMBRAL_STOCK_BAJO).length;
+        mostrarNotificacion(`Filtro activado: mostrando ${cant} producto(s) con stock bajo (≤ 3 unidades).`, 'advertencia');
+    }
+}
+
+function quitarFiltroStockBajo() {
+    filtroStockBajoActivo = false;
+    const inputBuscar = document.getElementById('inputBuscarAdmin');
+    renderTablaProductosAdmin(inputBuscar ? inputBuscar.value : '');
+}
+
+function irAInventarioStockBajo() {
+    const itemMenu = document.querySelector(`.menu-sidebar li[onclick*="'productos'"]`);
+    mostrarSeccionAdmin('productos', itemMenu);
+    filtroStockBajoActivo = true;
+    renderTablaProductosAdmin();
+    const cant = DB.productos.filter(p => Number(p.stock) <= UMBRAL_STOCK_BAJO).length;
+    mostrarNotificacion(`Mostrando ${cant} producto(s) con stock bajo (≤ 3 unidades).`, 'advertencia');
+}
+
 function inicializarAdmin() {
     verificarGuardiaRutal();
     DB = obtenerDB();
@@ -335,6 +365,14 @@ function inicializarAdmin() {
 
     activarSeccionDesdeUrl();
     window.addEventListener('hashchange', activarSeccionDesdeUrl);
+
+    // Alerta automática si hay equipos con stock crítico (≤ 3 unidades)
+    const prodsCriticos = DB.productos.filter(p => Number(p.stock) <= UMBRAL_STOCK_BAJO);
+    if (prodsCriticos.length > 0) {
+        setTimeout(() => {
+            mostrarNotificacion(`¡Alerta de Inventario! ${prodsCriticos.length} producto(s) tienen stock bajo (3 o menos unidades).`, 'advertencia');
+        }, 900);
+    }
 }
 
 function mostrarSeccionAdmin(idSeccion, elementoClick = null) {
@@ -370,7 +408,7 @@ function cargarDashboardStats() {
     const stockBajoEl = document.getElementById('dashStockBajo');
 
     const totalVentasMonto = DB.ventas.reduce((acc, v) => acc + v.total, 0);
-    const prodBajoStock = DB.productos.filter(p => p.stock <= 5).length;
+    const prodBajoStock = DB.productos.filter(p => Number(p.stock) <= UMBRAL_STOCK_BAJO).length;
 
     if (totalProdEl) totalProdEl.innerText = DB.productos.length;
     if (totalVentasEl) totalVentasEl.innerText = '$' + totalVentasMonto.toFixed(2);
@@ -432,26 +470,89 @@ function renderTablaProductosAdmin(filtroTexto = '') {
     const tbody = document.querySelector('#tablaProductosAdmin tbody');
     if (!tbody) return;
 
-    let html = '';
-    const productosFiltrados = DB.productos.filter(p => p.nombre.toLowerCase().includes(filtroTexto.toLowerCase()));
+    const productosCriticos = DB.productos.filter(p => Number(p.stock) <= UMBRAL_STOCK_BAJO);
+    const cantCriticos = productosCriticos.length;
 
+    // Actualizar botón de alerta de stock bajo
+    const btnAlerta = document.getElementById('btnAlertaStockBajo');
+    const textoBtnAlerta = document.getElementById('textoBtnAlertaStock');
+    if (btnAlerta && textoBtnAlerta) {
+        if (cantCriticos > 0) {
+            btnAlerta.style.display = 'inline-flex';
+            btnAlerta.className = `btn-alerta-stock-toggle ${filtroStockBajoActivo ? 'btn-secundario' : 'alerta-activa'}`;
+            textoBtnAlerta.innerHTML = filtroStockBajoActivo
+                ? `<i class="fa-solid fa-list"></i> Ver Todo (${DB.productos.length})`
+                : `Stock Bajo: <strong>${cantCriticos}</strong> (≤ 3)`;
+        } else {
+            btnAlerta.style.display = 'inline-flex';
+            btnAlerta.className = 'btn-alerta-stock-toggle alerta-optimo';
+            textoBtnAlerta.innerHTML = `<i class="fa-solid fa-circle-check"></i> Stock Óptimo (0)`;
+        }
+    }
+
+    // Actualizar banner de alerta de stock crítico
+    const banner = document.getElementById('bannerAlertaStockAdmin');
+    const textoBanner = document.getElementById('bannerAlertaDesc');
+    const textoBtnBanner = document.getElementById('textoBtnBannerFiltro');
+    if (banner) {
+        if (cantCriticos > 0) {
+            banner.style.display = 'flex';
+            if (textoBanner) {
+                const nombresProds = productosCriticos.slice(0, 3).map(p => `<strong>${p.nombre}</strong> (${p.stock} unids)`).join(', ');
+                const mas = cantCriticos > 3 ? ` y ${cantCriticos - 3} más` : '';
+                textoBanner.innerHTML = `Tienes <strong>${cantCriticos} equipo(s)</strong> con 3 o menos unidades disponibles: ${nombresProds}${mas}.`;
+            }
+            if (textoBtnBanner) {
+                textoBtnBanner.textContent = filtroStockBajoActivo ? 'Ver todos los equipos' : 'Ver equipos críticos';
+            }
+        } else {
+            banner.style.display = 'none';
+        }
+    }
+
+    // Actualizar badge de filtro activo
+    const filtroBadge = document.getElementById('filtroActivoBadge');
+    if (filtroBadge) {
+        filtroBadge.style.display = filtroStockBajoActivo ? 'block' : 'none';
+    }
+
+    // Filtrar productos
+    let productosFiltrados = DB.productos.filter(p => p.nombre.toLowerCase().includes(filtroTexto.toLowerCase()));
+    if (filtroStockBajoActivo) {
+        productosFiltrados = productosFiltrados.filter(p => Number(p.stock) <= UMBRAL_STOCK_BAJO);
+    }
+
+    let html = '';
     if (productosFiltrados.length === 0) {
-        html = `<tr><td colspan="7" class="text-center">No se encontraron productos registrados.</td></tr>`;
+        html = filtroStockBajoActivo
+            ? `<tr><td colspan="7" class="text-center" style="padding:30px;"><i class="fa-solid fa-circle-check" style="font-size:28px; color:var(--success); margin-bottom:8px; display:block;"></i>¡Excelente! No hay equipos con stock bajo (≤ 3 unidades). <button type="button" class="btn-secundario btn-sm" onclick="quitarFiltroStockBajo()" style="margin-left:10px;">Ver todos los equipos</button></td></tr>`
+            : `<tr><td colspan="7" class="text-center">No se encontraron productos registrados.</td></tr>`;
     } else {
         productosFiltrados.forEach(p => {
             const catObj = DB.categorias.find(c => c.id === p.categoria);
             const catNombre = catObj ? catObj.nombre : 'Sin Categoría';
-            const stockBadge = p.stock <= 5 ? 'badge-peligro' : p.stock <= 10 ? 'badge-advertencia' : 'badge-exito';
+            const stockNum = Number(p.stock);
+
+            let stockHtml = '';
+            if (stockNum <= 0) {
+                stockHtml = `<span class="badge badge-peligro"><i class="fa-solid fa-ban"></i> 0 unids (Agotado)</span>`;
+            } else if (stockNum <= UMBRAL_STOCK_BAJO) {
+                stockHtml = `<span class="badge badge-stock-alerta badge-alerta-parpadeo"><i class="fa-solid fa-triangle-exclamation"></i> ${stockNum} unids (Stock Bajo)</span>`;
+            } else if (stockNum <= 8) {
+                stockHtml = `<span class="badge badge-advertencia">${stockNum} unids</span>`;
+            } else {
+                stockHtml = `<span class="badge badge-exito">${stockNum} unids</span>`;
+            }
 
             html += `
-                <tr>
+                <tr ${stockNum <= UMBRAL_STOCK_BAJO ? 'style="background: #fff8f8;"' : ''}>
                     <td>
                         <img src="${p.imagen}" alt="${p.nombre}" class="img-thumb">
                     </td>
                     <td><strong>${p.nombre}</strong><br><small class="text-muted">${p.descripcion || ''}</small></td>
                     <td><span class="badge badge-categoria">${catNombre}</span></td>
-                    <td>$${p.precio.toFixed(2)}</td>
-                    <td><span class="badge ${stockBadge}">${p.stock} unids</span></td>
+                    <td>$${Number(p.precio).toFixed(2)}</td>
+                    <td>${stockHtml}</td>
                     <td><small>${p.proveedor || 'N/A'}</small></td>
                     <td>
                         <div class="acciones-btn">
@@ -986,8 +1087,17 @@ function filtrarCatalogoLanding() {
         html = `<div class="sin-resultados" style="grid-column: 1/-1;"><h3>No hay productos disponibles aún.</h3><p>Pronto agregaremos nuevos equipos tecnológicos.</p></div>`;
     } else {
         productos.forEach(p => {
-            const agotado = p.stock <= 0;
-            const stockTexto = agotado ? '<span class="badge badge-peligro">Agotado</span>' : `<span class="badge badge-exito">Stock: ${p.stock} unids</span>`;
+            const stockNum = Number(p.stock);
+            const agotado = stockNum <= 0;
+            const stockBajo = !agotado && stockNum <= UMBRAL_STOCK_BAJO;
+            let stockTexto = '';
+            if (agotado) {
+                stockTexto = '<span class="badge badge-peligro"><i class="fa-solid fa-ban"></i> Agotado</span>';
+            } else if (stockBajo) {
+                stockTexto = `<span class="badge badge-stock-alerta badge-alerta-parpadeo"><i class="fa-solid fa-triangle-exclamation"></i> ¡Stock Bajo: ${stockNum} unids!</span>`;
+            } else {
+                stockTexto = `<span class="badge badge-exito">Stock: ${stockNum} unids</span>`;
+            }
             html += `
                 <div class="tarjeta-producto">
                     <div class="badge-stock-top">${stockTexto}</div>
@@ -1021,13 +1131,21 @@ function verDetalleProductoLanding(idProd) {
     const modal = document.getElementById('modalDetalleProducto');
     if (!producto || !modal) return;
 
-    const agotado = Number(producto.stock) <= 0;
+    const stockNum = Number(producto.stock);
+    const agotado = stockNum <= 0;
+    const stockBajo = !agotado && stockNum <= UMBRAL_STOCK_BAJO;
     document.getElementById('detalleProductoImagen').src = producto.imagen;
     document.getElementById('detalleProductoImagen').alt = producto.nombre;
     document.getElementById('detalleProductoNombre').textContent = producto.nombre;
     document.getElementById('detalleProductoDescripcion').textContent = producto.descripcion || 'Equipo tecnológico con garantía oficial.';
     document.getElementById('detalleProductoPrecio').textContent = `$${Number(producto.precio).toFixed(2)}`;
-    document.getElementById('detalleProductoStock').textContent = agotado ? 'Agotado' : `${producto.stock} unidades disponibles`;
+
+    let stockMensaje = agotado
+        ? 'Agotado'
+        : stockBajo
+            ? `¡Alerta de Stock Bajo! Solo quedan ${stockNum} unidades disponibles`
+            : `${producto.stock} unidades disponibles`;
+    document.getElementById('detalleProductoStock').innerHTML = stockMensaje;
     document.getElementById('detalleProductoProveedor').textContent = producto.proveedor || 'Proveedor verificado';
 
     const botonCompra = document.getElementById('btnComprarDetalle');
@@ -1102,8 +1220,17 @@ function renderCatalogoCliente() {
         `;
     } else {
         productos.forEach(p => {
-            const agotado = p.stock <= 0;
-            const stockTexto = agotado ? '<span class="badge badge-peligro">Agotado</span>' : `<span class="badge badge-exito">Stock: ${p.stock} unids</span>`;
+            const stockNum = Number(p.stock);
+            const agotado = stockNum <= 0;
+            const stockBajo = !agotado && stockNum <= UMBRAL_STOCK_BAJO;
+            let stockTexto = '';
+            if (agotado) {
+                stockTexto = '<span class="badge badge-peligro"><i class="fa-solid fa-ban"></i> Agotado</span>';
+            } else if (stockBajo) {
+                stockTexto = `<span class="badge badge-stock-alerta badge-alerta-parpadeo"><i class="fa-solid fa-triangle-exclamation"></i> ¡Stock Bajo: ${stockNum} unids!</span>`;
+            } else {
+                stockTexto = `<span class="badge badge-exito">Stock: ${stockNum} unids</span>`;
+            }
 
             const msjWa = encodeURIComponent(`Hola TechStore EC, me interesa consultar disponibilidad del producto: ${p.nombre} (Precio: $${p.precio.toFixed(2)})`);
             const urlWaProducto = `https://wa.me/5930980790362?text=${msjWa}`;

@@ -91,11 +91,11 @@
                             <p>Clientes Registrados</p>
                         </div>
                     </div>
-                    <div class="card-kpi">
+                    <div class="card-kpi" onclick="irAInventarioStockBajo()" style="cursor: pointer;" title="Clic para ver equipos con stock bajo (≤ 3 unidades)">
                         <div class="kpi-icono kpi-red"><i class="fa-solid fa-triangle-exclamation"></i></div>
                         <div class="kpi-data">
                             <h3 id="dashStockBajo">0</h3>
-                            <p>Equipos Stock Bajo</p>
+                            <p>Equipos Stock Bajo (≤ 3)</p>
                         </div>
                     </div>
                 </div>
@@ -140,23 +140,54 @@
 
             <!-- SECCIÓN 2: INVENTARIO DE PRODUCTOS (CRUD) -->
             <section id="productos" class="seccion-admin oculto">
-                <div class="topbar-admin" style="border:none; margin-bottom:20px;">
+                <div class="topbar-admin" style="border:none; margin-bottom:20px; flex-wrap:wrap; gap:15px;">
                     <div>
                         <h2>Gestión de Equipos Tecnológicos</h2>
                         <p class="text-muted">Administra el inventario de Laptops, PC Gamer, accesorios y componentes.
                         </p>
                     </div>
-                    <button class="btn-principal" onclick="abrirModalProducto(false)">
-                        <i class="fa-solid fa-circle-plus"></i> Nuevo Equipo
-                    </button>
+                    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                        <button id="btnAlertaStockBajo" type="button" class="btn-alerta-stock-toggle alerta-activa" onclick="alternarFiltroStockBajo()" title="Clic para filtrar u ocultar productos críticos">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <span id="textoBtnAlertaStock">Stock Bajo (≤ 3)</span>
+                        </button>
+                        <button class="btn-principal" onclick="abrirModalProducto(false)">
+                            <i class="fa-solid fa-circle-plus"></i> Nuevo Equipo
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Buscador de inventario -->
-                <div class="barra-filtros-cliente" style="margin-bottom: 20px;">
-                    <div class="input-buscar-box">
+                <!-- Banner Alerta de Stock Crítico -->
+                <div id="bannerAlertaStockAdmin" class="banner-alerta-stock" style="display:none;">
+                    <div class="banner-alerta-contenido">
+                        <i class="fa-solid fa-triangle-exclamation banner-icono"></i>
+                        <div>
+                            <strong id="bannerAlertaTitulo">¡Alerta de Stock Crítico!</strong>
+                            <p id="bannerAlertaDesc">Existen equipos tecnológicos con 3 o menos unidades en inventario.</p>
+                        </div>
+                    </div>
+                    <div class="banner-alerta-acciones">
+                        <button id="btnBannerAccionFiltro" type="button" class="btn-alerta-accion" onclick="alternarFiltroStockBajo()">
+                            <i class="fa-solid fa-filter"></i> <span id="textoBtnBannerFiltro">Ver equipos críticos</span>
+                        </button>
+                        <a href="nuevo-ingreso-stock.html" class="btn-alerta-reabastecer">
+                            <i class="fa-solid fa-truck-ramp-box"></i> Reabastecer Stock
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Buscador de inventario y estado de filtro -->
+                <div class="barra-filtros-cliente" style="margin-bottom: 20px; display:flex; gap:15px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
+                    <div class="input-buscar-box" style="flex:1; min-width:280px;">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" placeholder="Buscar equipo por nombre o modelo..."
+                        <input type="text" id="inputBuscarAdmin" placeholder="Buscar equipo por nombre o modelo..."
                             onkeyup="renderTablaProductosAdmin(this.value)">
+                    </div>
+                    <div id="filtroActivoBadge" style="display:none;">
+                        <span class="badge badge-stock-alerta" style="font-size: 13px; padding: 7px 14px; display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-filter"></i> Mostrando solo Stock Bajo (≤ 3 unids)
+                            <button type="button" onclick="quitarFiltroStockBajo()" style="background: none; border: none; color: inherit; cursor: pointer; font-size: 15px; font-weight: bold; margin-left: 6px; line-height: 1;" title="Quitar filtro y ver todos">&times;</button>
+                        </span>
                     </div>
                 </div>
 

@@ -2763,3 +2763,150 @@ tr:hover {
     border-radius: var(--radius-md);
     box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
 }
+
+/* ==========================================================================
+   ALERTAS Y COMPONENTES DE STOCK BAJO (INVENTARIO)
+   ========================================================================== */
+.banner-alerta-stock {
+    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+    border: 1px solid #fecdd3;
+    border-left: 5px solid #e11d48;
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.08);
+    animation: fadeInSlideDown 0.3s ease-out;
+}
+
+@keyframes fadeInSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.banner-alerta-contenido {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.banner-alerta-contenido .banner-icono {
+    font-size: 26px;
+    color: #e11d48;
+    animation: pulsoAlerta 2s infinite ease-in-out;
+}
+
+@keyframes pulsoAlerta {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.12); opacity: 0.85; }
+}
+
+.banner-alerta-contenido strong {
+    display: block;
+    color: #9f1239;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.banner-alerta-contenido p {
+    color: #881337;
+    font-size: 13px;
+    margin: 0;
+}
+
+.banner-alerta-acciones {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn-alerta-accion {
+    background: #e11d48;
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition);
+}
+
+.btn-alerta-accion:hover {
+    background: #be123c;
+    box-shadow: 0 2px 8px rgba(190, 18, 60, 0.35);
+}
+
+.btn-alerta-reabastecer {
+    background: #ffffff;
+    color: #9f1239;
+    border: 1px solid #fecdd3;
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition);
+}
+
+.btn-alerta-reabastecer:hover {
+    background: #ffe4e6;
+    border-color: #fda4af;
+}
+
+.btn-alerta-stock-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-alerta-stock-toggle.alerta-activa {
+    background: #e11d48;
+    color: white;
+    box-shadow: 0 4px 14px rgba(225, 29, 72, 0.3);
+}
+
+.btn-alerta-stock-toggle.alerta-activa:hover {
+    background: #be123c;
+}
+
+.btn-alerta-stock-toggle.alerta-optimo {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid var(--border-color);
+}
+
+.badge-stock-alerta {
+    background: #ffe4e6 !important;
+    color: #e11d48 !important;
+    border: 1px solid #fecdd3;
+    font-weight: 700 !important;
+}
+
+.badge-alerta-parpadeo {
+    box-shadow: 0 0 0 2px rgba(225, 29, 72, 0.2);
+}
