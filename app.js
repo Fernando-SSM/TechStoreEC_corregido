@@ -322,6 +322,19 @@ function inicializarAdmin() {
     renderCategoriasAdmin();
     renderVentasAdmin();
     renderClientesAdmin();
+
+    const activarSeccionDesdeUrl = () => {
+        const hashSeccion = window.location.hash.replace('#', '');
+        const paramSeccion = new URLSearchParams(window.location.search).get('seccion');
+        const seccionActiva = hashSeccion || paramSeccion;
+        if (seccionActiva) {
+            const itemMenu = document.querySelector(`.menu-sidebar li[onclick*="'${seccionActiva}'"]`);
+            mostrarSeccionAdmin(seccionActiva, itemMenu);
+        }
+    };
+
+    activarSeccionDesdeUrl();
+    window.addEventListener('hashchange', activarSeccionDesdeUrl);
 }
 
 function mostrarSeccionAdmin(idSeccion, elementoClick = null) {
@@ -607,7 +620,7 @@ document.getElementById('formEditarCategoriaAdmin')?.addEventListener('submit', 
         await cargarDBDesdeAPI();
         cerrarModalCategoriaAdmin();
         mostrarNotificacion('Categoría actualizada correctamente.', 'exito');
-        setTimeout(() => { window.location.href = 'admin.html'; }, 700);
+        setTimeout(() => { window.location.href = 'admin.html#categorias'; }, 700);
     } catch (error) {
         mostrarNotificacion(error.message, 'error');
     }
@@ -623,10 +636,13 @@ document.getElementById('formCategoriaAdmin')?.addEventListener('submit', async 
     try {
         await solicitarAPI('categorias', 'crear', { nombre, descripcion: desc });
         await cargarDBDesdeAPI();
-        mostrarNotificacion('Nueva categoría creada.', 'exito');
+        mostrarNotificacion('Nueva categoría creada con éxito.', 'exito');
         this.reset();
         renderCategoriasAdmin();
         cargarFiltrosCliente();
+        setTimeout(() => {
+            window.location.href = 'admin.html#categorias';
+        }, 700);
     } catch (error) {
         mostrarNotificacion(error.message, 'error');
     }
@@ -2070,5 +2086,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         inicializarFormularioProveedor();
     } else if (page.includes('nuevo-ingreso-stock.html')) {
         inicializarFormularioCompraStock();
+    } else if (page.includes('nueva-categoria.html')) {
+        verificarGuardiaRutal();
     }
 });
