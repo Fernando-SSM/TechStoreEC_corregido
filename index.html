@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechStore EC | Tecnología para todos</title>
+    <meta name="description"
+        content="Compra laptops, computadores, monitores, periféricos y componentes tecnológicos en TechStore EC.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=computer" />
+</head>
+
+<body class="pagina-tienda">
+    <header class="header-tienda">
+        <div class="cabecera-principal">
+            <a href="index.html" class="marca-tienda" aria-label="TechStore EC inicio"><span
+                    class="material-symbols-outlined">computer</span><span>TECH<span>STORE</span></span></a>
+            <div class="buscador-tienda"><i class="fa-solid fa-magnifying-glass"></i><input id="buscarLanding"
+                    type="search" placeholder="¿Qué estás buscando?" aria-label="Buscar productos"
+                    oninput="filtrarCatalogoLanding()"><button onclick="filtrarCatalogoLanding()" title="Buscar"><i
+                        class="fa-solid fa-arrow-right"></i></button></div>
+            <div class="acciones-cabecera">
+                <button class="cuenta-tienda" onclick="mostrarLogin('cliente')"><i
+                        class="fa-regular fa-user"></i><span><small>Clientes</small><strong>Iniciar
+                            sesión</strong></span></button>
+                <button class="cuenta-tienda acceso-admin" onclick="mostrarLogin('admin')"><i
+                        class="fa-solid fa-user-shield"></i><span><small>Personal interno</small><strong>Acceso
+                            administrador</strong></span></button>
+                <button class="carrito-tienda" onclick="mostrarRegistro()" title="Registrarse para comprar"><i
+                        class="fa-solid fa-cart-shopping"></i><span class="contador-carrito">0</span><span><small>Tu
+                            carrito</small><strong>$0,00</strong></span></button>
+            </div>
+        </div>
+        <nav class="nav-tienda" aria-label="Navegación principal">
+            <div class="menu-categorias-tienda">
+                <button class="boton-categorias" onclick="alternarMenuCategoriasLanding()"><i
+                        class="fa-solid fa-bars"></i> Categorías <i class="fa-solid fa-chevron-down"></i></button>
+                <div id="navCategoriasLanding" class="nav-categorias-dinamicas"></div>
+            </div>
+            <a href="#catalogoHome" onclick="seleccionarCategoriaLanding('')">Inicio</a>
+            <a href="#beneficios">Beneficios</a>
+            <div class="nav-accesos"><button class="nav-registro" onclick="mostrarRegistro()"><i
+                        class="fa-solid fa-user-plus"></i> Registrarme</button><button class="nav-admin"
+                    onclick="mostrarLogin('admin')"><i class="fa-solid fa-lock"></i> Administrador</button></div>
+        </nav>
+    </header>
+    <main>
+        <div class="ruta-tienda"><a href="#">Inicio</a><span>/</span><strong>Productos tecnológicos</strong></div>
+        <section class="catalogo-home" id="catalogoHome">
+            <aside class="filtros-home">
+                <div class="filtros-titulo">
+                    <h2>Categorías</h2>
+                </div>
+                <button class="filtro-categoria activo" data-categoria=""
+                    onclick="seleccionarCategoriaLanding('')">Todos los productos <span
+                        id="totalProductosLanding">0</span></button>
+                <div id="categoriasLandingDinamicas"></div>
+                <div class="filtro-ayuda"><i class="fa-solid fa-headset"></i><strong>¿Necesitas
+                        ayuda?</strong><span>Estamos listos para asesorarte</span><button
+                        onclick="mostrarLogin()">Hablar con nosotros</button></div>
+            </aside>
+            <section class="resultados-home">
+                <div class="encabezado-resultados">
+                    <div><span class="eyebrow-tienda">TECNOLOGÍA DESTACADA</span>
+                        <h1>Encuentra lo que necesitas</h1>
+                        <p>Equipos seleccionados para llevar tus ideas más lejos.</p>
+                    </div><label class="orden-home">Ordenar por:<select id="ordenLanding"
+                            onchange="filtrarCatalogoLanding()">
+                            <option value="destacados">Más destacados</option>
+                            <option value="menor">Precio: menor a mayor</option>
+                            <option value="mayor">Precio: mayor a menor</option>
+                        </select></label>
+                </div>
+                <div class="resumen-resultados"><span id="resumenProductosLanding">Mostrando productos
+                        disponibles</span><button onclick="mostrarRegistro()"><i class="fa-solid fa-user-plus"></i>
+                        Regístrate para comprar</button></div>
+                <div id="gridProductosLanding" class="grid-productos-cliente"></div>
+            </section>
+        </section>
+        <section class="beneficios-tienda" id="beneficios">
+            <div><i class="fa-solid fa-truck-fast"></i><span><strong>Envíos a todo Ecuador</strong>Recibe tu pedido
+                    seguro</span></div>
+            <div><i class="fa-solid fa-shield-halved"></i><span><strong>Compra protegida</strong>Garantía oficial</span>
+            </div>
+            <div><i class="fa-solid fa-credit-card"></i><span><strong>Pagos seguros</strong>Varias formas de pago</span>
+            </div>
+            <div><i class="fa-solid fa-headset"></i><span><strong>Asesoría experta</strong>Te ayudamos a elegir</span>
+            </div>
+        </section>
+    </main>
+    <div class="modal-overlay" id="modalDetalleProducto">
+        <div class="modal-contenedor modal-detalle-producto">
+            <span class="cerrar-modal" onclick="cerrarDetalleProductoLanding()">&times;</span>
+            <div class="detalle-producto-grid">
+                <div class="detalle-producto-imagen"><img id="detalleProductoImagen" src="" alt=""></div>
+                <div class="detalle-producto-info">
+                    <span class="eyebrow-tienda">DETALLE DEL PRODUCTO</span>
+                    <h2 id="detalleProductoNombre"></h2>
+                    <p id="detalleProductoDescripcion" class="texto-modal"></p>
+                    <strong id="detalleProductoPrecio" class="detalle-producto-precio"></strong>
+                    <div class="detalle-producto-meta"><span><i class="fa-solid fa-box"></i> <strong
+                                id="detalleProductoStock"></strong></span><span><i class="fa-solid fa-truck"></i>
+                            <strong id="detalleProductoProveedor"></strong></span></div>
+                    <button id="btnComprarDetalle" class="btn-principal btn-block"></button>
+                    <small class="detalle-producto-nota"><i class="fa-solid fa-lock"></i> Para comprar necesitas una
+                        cuenta de cliente.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="modalLogin">
+        <div class="modal-contenedor"><span class="cerrar-modal" onclick="cerrarLogin()">&times;</span>
+            <div class="auth-tabs"><button class="tab-btn activo" id="tabLoginBtn" onclick="cambiarTabAuth('login')"><i
+                        class="fa-solid fa-lock"></i> <span id="textoTabLogin">Acceso cliente</span></button><button
+                    class="tab-btn" id="tabRegBtn" onclick="cambiarTabAuth('registro')"><i
+                        class="fa-solid fa-user-plus"></i> Crear cuenta</button></div>
+            <form id="formLogin">
+                <h2 id="tituloFormLogin">Acceso</h2>
+                <div class="grupo-form"><label for="usuario"><i class="fa-solid fa-user"></i> Nombre de
+                        usuario</label><input type="text" id="usuario" placeholder="Ej: cliente" required></div>
+                <div class="grupo-form"><label for="contrasena"><i class="fa-solid fa-key"></i> Contraseña</label><input
+                        type="password" id="contrasena" placeholder="Ingrese su contraseña" required></div><button
+                    type="submit" class="btn-principal btn-block"><i class="fa-solid fa-right-to-bracket"></i>
+                    Entrar</button>
+            </form>
+            <form id="formRegistro" style="display: none;">
+                <h2>Crea tu cuenta</h2>
+                <p class="texto-modal">Regístrate para comprar tus productos tecnológicos.</p>
+                <div class="grupo-form"><label for="regNombre"><i class="fa-solid fa-id-card"></i> Nombre
+                        completo</label><input type="text" id="regNombre" placeholder="Ej: Juan Pérez" required></div>
+                <div class="grupo-form"><label for="regCorreo"><i class="fa-solid fa-envelope"></i> Correo
+                        electrónico</label><input type="email" id="regCorreo" placeholder="correo@ejemplo.com" required>
+                </div>
+                <div class="grupo-form"><label for="regUsuario"><i class="fa-solid fa-user"></i> Crear
+                        usuario</label><input type="text" id="regUsuario" placeholder="Elija un usuario" required></div>
+                <div class="grupo-form"><label for="regTelefono"><i class="fa-solid fa-phone"></i> Teléfono
+                        móvil</label><input type="tel" id="regTelefono" placeholder="0987654321" required maxlength="10"
+                        pattern="\d{10}" title="Debe contener exactamente 10 dígitos numéricos"><small
+                        id="regTelefonoError" class="input-error" style="color:#c0392b; display:none;">El teléfono debe
+                        contener exactamente 10 dígitos numéricos.</small></div>
+                <div class="grupo-form"><label for="regContrasena"><i class="fa-solid fa-lock"></i>
+                        Contraseña</label><input type="password" id="regContrasena" placeholder="Mínimo 4 caracteres"
+                        required></div><button type="submit" class="btn-principal btn-block"><i
+                        class="fa-solid fa-user-check"></i> Crear cuenta de cliente</button>
+            </form>
+        </div>
+    </div>
+    <footer class="footer-global" id="contacto">
+        <p> TechStore </p>
+    </footer>
+    <script src="app.js"></script>
+</body>
+
+</html>

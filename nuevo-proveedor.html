@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Proveedor - TechStore EC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="contenido-admin" style="max-width:900px; margin:0 auto; min-height:100vh; padding:40px 25px;">
+        <header class="topbar-admin" style="margin-bottom:30px;">
+            <div>
+                <h1>Registrar Nuevo Proveedor</h1>
+                <p class="text-muted">Agregue fabricantes y mayoristas autorizados.</p>
+            </div>
+            <a href="proveedores.html" class="btn-secundario"><i class="fa-solid fa-arrow-left"></i> Volver</a>
+        </header>
+        <section style="background:white; padding:25px; border-radius:var(--radius-lg); border:1px solid var(--border-color);">
+            <form id="formProveedor" class="form-grid-2">
+                <input type="hidden" id="idProveedor">
+                <div class="grupo-form">
+                    <label for="provNombre">Nombre de la Empresa / Distribuidor *</label>
+                    <input type="text" id="provNombre" placeholder="Ej: ASUS Ecuador S.A." required>
+                </div>
+                <div class="grupo-form">
+                    <label for="provRuc">RUC de la Empresa *</label>
+                    <input type="tel" id="provRuc" maxlength="10" pattern="\d{10}" placeholder="1792345678" required>
+                </div>
+                <div class="grupo-form">
+                    <label for="provContacto">Persona de Contacto</label>
+                    <input type="text" id="provContacto" placeholder="Ej: Ing. Roberto Paz">
+                </div>
+                <div class="grupo-form">
+                    <label for="provTelefono">Teléfono de Contacto</label>
+                    <input type="tel" id="provTelefono" maxlength="10" pattern="\d{10}" placeholder="0987654321" required>
+                </div>
+                <div class="grupo-form">
+                    <label for="provCorreo">Correo Electrónico</label>
+                    <input type="email" id="provCorreo" placeholder="ventas@empresa.com.ec">
+                </div>
+                <div class="grupo-form">
+                    <label for="provCiudad">Ciudad Principal</label>
+                    <input type="text" id="provCiudad" placeholder="Ej: Quito / Guayaquil">
+                </div>
+                <div style="grid-column:1/-1; display:flex; gap:15px; flex-wrap:wrap;">
+                    <button type="submit" class="btn-principal" id="btnGuardarProveedor"><i class="fa-solid fa-floppy-disk"></i> Guardar Proveedor</button>
+                    <a href="proveedores.html" class="btn-secundario">Cancelar</a>
+                </div>
+            </form>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>

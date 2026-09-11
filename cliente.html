@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Virtual - TechStore EC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Botón Flotante de WhatsApp (+593 0980790362) -->
+    <a href="https://wa.me/5930980790362?text=Hola%20TechStore%20EC,%20deseo%20consultar%20sobre%20un%20pedido"
+        target="_blank" class="whatsapp-float" title="Consultar por WhatsApp +593 0980790362">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- Header Navegación Cliente -->
+    <header class="header-cliente">
+        <nav class="nav-cliente">
+            <div class="brand-logo">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>TechStore EC</span>
+            </div>
+
+            <div class="nav-links-cliente">
+                <a href="#" class="nav-link-cliente activo" onclick="mostrarSeccionClienteView('tienda', this)">
+                    <i class="fa-solid fa-store"></i> Catálogo Tienda
+                </a>
+                <a href="#" class="nav-link-cliente" onclick="mostrarSeccionClienteView('miscompras', this)">
+                    <i class="fa-solid fa-bag-shopping"></i> Mis Compras
+                </a>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <!-- Botón Carrito con Contador -->
+                <button class="btn-carrito-nav" onclick="abrirDrawerCarrito()">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Carrito</span>
+                    <span class="badge-count-carrito">0</span>
+                </button>
+
+                <div class="user-badge-admin" style="padding: 6px 14px;">
+                    <i class="fa-solid fa-user-circle"></i>
+                    <span id="nombreClienteNav">Cliente</span>
+                </div>
+
+                <button class="btn-peligro btn-sm" onclick="cerrarSesion()" title="Cerrar Sesión">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="contenedor-cliente-main">
+
+        <!-- VISTA 1: CATÁLOGO DE PRODUCTOS -->
+        <section id="tienda" class="seccion-cliente-view">
+            <!-- Barra de Búsqueda y Filtros -->
+            <div class="barra-filtros-cliente">
+                <div class="input-buscar-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="buscarProdCliente"
+                        placeholder="Buscar laptop, pc gamer, monitor o accesorios..."
+                        onkeyup="renderCatalogoCliente()">
+                </div>
+
+                <div style="width: 250px;">
+                    <select id="filtroCatCliente" onchange="renderCatalogoCliente()" class="grupo-form"
+                        style="margin-bottom:0;">
+                        <option value="">Todas las Categorías</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Grid de Tarjetas de Productos -->
+            <div id="gridCatalogoCliente" class="grid-productos-cliente"></div>
+        </section>
+
+        <!-- VISTA 2: MIS COMPRAS / PEDIDOS REALIZADOS -->
+        <section id="miscompras" class="seccion-cliente-view oculto">
+            <div class="titulo-seccion" style="text-align: left; margin-bottom: 25px;">
+                <h2>Historial de Mis Compras</h2>
+                <p>Revisa el estado de entrega de tus pedidos tecnológicos y consulta tus comprobantes.</p>
+            </div>
+
+            <div class="tabla-contenedor">
+                <table id="tablaMisComprasCliente">
+                    <thead>
+                        <tr>
+                            <th># Pedido</th>
+                            <th>Fecha</th>
+                            <th>Productos</th>
+                            <th>Total ($ USD)</th>
+                            <th>Estado</th>
+                            <th>Comprobante</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- DRAWER CARRITO DE COMPRAS -->
+    <div class="drawer-carrito" id="drawerCarrito">
+        <div class="header-drawer">
+            <h3><i class="fa-solid fa-cart-shopping"></i> Mi Carrito de Compras</h3>
+            <span class="cerrar-modal" onclick="cerrarDrawerCarrito()">&times;</span>
+        </div>
+
+        <div class="elementos-carrito-list" id="elementosCarritoDrawer"></div>
+
+        <div class="footer-drawer">
+            <div class="resumen-precios">
+                <div class="fila-resumen">
+                    <span>Subtotal:</span>
+                    <strong id="subtotalMontoCarrito">$0.00</strong>
+                </div>
+                <div class="fila-resumen">
+                    <span>IVA (15%):</span>
+                    <strong id="ivaMontoCarrito">$0.00</strong>
+                </div>
+                <div class="fila-resumen fila-total">
+                    <span>Total a Pagar:</span>
+                    <strong id="totalMontoCarrito">$0.00</strong>
+                </div>
+            </div>
+
+            <button class="btn-principal btn-block" onclick="procesarCheckoutModal()">
+                <i class="fa-solid fa-credit-card"></i> Proceder a Finalizar Compra
+            </button>
+        </div>
+    </div>
+
+    <!-- 1. SELECCIÓN DE MÉTODO DE PAGO -->
+    <div class="modal-overlay" id="modalCheckoutSelector">
+        <div class="modal-contenedor modal-contenedor-lg">
+            <span class="cerrar-modal" onclick="cerrarTodosModalesPago()">&times;</span>
+
+            <!-- Barra de pasos humanizada -->
+            <div class="pasos-checkout-bar">
+                <div class="paso-item activo">
+                    <span class="paso-numero">1</span>
+                    <span class="paso-titulo">Forma de Pago</span>
+                </div>
+                <div class="paso-linea"></div>
+                <div class="paso-item">
+                    <span class="paso-numero">2</span>
+                    <span class="paso-titulo">Datos y Detalles</span>
+                </div>
+                <div class="paso-linea"></div>
+                <div class="paso-item">
+                    <span class="paso-numero">3</span>
+                    <span class="paso-titulo">Confirmación</span>
+                </div>
+            </div>
+
+            <div class="header-modal-pago">
+                <p class="text-muted">¿Qué método de pago deseas utilizar?</p>
+            </div>
+
+            <div class="resumen-checkout-banner">
+                <div>
+                    <span class="subtexto-banner">Total a pagar con impuestos incluidos:</span>
+                    <strong class="total-resumen-destacado" id="totalCheckoutSelector">$0.00</strong>
+                </div>
+            </div>
+
+            <div class="grid-metodos-pago">
+                <!-- Opción 1: Tarjeta -->
+                <div class="card-metodo-pago card-metodo-popular" onclick="abrirPantallaPago('tarjeta')">
+                    <div class="icono-metodo tarjeta-gradient">
+                        <i class="fa-solid fa-credit-card"></i>
+                    </div>
+                    <div class="info-metodo">
+                        <h3>Tarjeta de Crédito o Débito</h3>
+                        <p>Visa, Mastercard, Amex y Diners. Difiere tu compra hasta 12 meses con facilidades de pago.
+                        </p>
+                    </div>
+                    <button class="btn-seleccionar-metodo">
+                        Elegir Tarjeta <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Opción 2: Transferencia -->
+                <div class="card-metodo-pago" onclick="abrirPantallaPago('transferencia')">
+                    <div class="icono-metodo banco-gradient">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <div class="info-metodo">
+                        <h3>Transferencia Bancaria Directa</h3>
+                        <p>Transfiere cómodamente desde la app de tu banco (Pichincha, Guayaquil, Produbanco) sin
+                            recargos.</p>
+                    </div>
+                    <button class="btn-seleccionar-metodo">
+                        Elegir Transferencia <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Opción 3: Efectivo Contra Entrega -->
+                <div class="card-metodo-pago" onclick="abrirPantallaPago('efectivo')">
+                    <div class="icono-metodo efectivo-gradient">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                    </div>
+                    <div class="info-metodo">
+                        <h3>Pago Contra Entrega en Efectivo</h3>
+                        <p>Pagas tranquilamente en efectivo en la puerta de tu casa al momento de recibir el paquete.
+                        </p>
+                    </div>
+                    <button class="btn-seleccionar-metodo">
+                        Elegir Efectivo <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. PANTALLA INDIVIDUAL: TARJETA DE CRÉDITO / DÉBITO -->
+    <div class="modal-overlay" id="modalPagoTarjeta">
+        <div class="modal-contenedor modal-contenedor-lg">
+            <span class="cerrar-modal" onclick="cerrarTodosModalesPago()">&times;</span>
+
+            <div class="pasos-checkout-bar">
+                <div class="paso-item completado" onclick="abrirSelectorPago()">
+                    <span class="paso-numero"><i class="fa-solid fa-check"></i></span>
+                    <span class="paso-titulo">Forma de Pago</span>
+                </div>
+                <div class="paso-linea completada"></div>
+                <div class="paso-item activo">
+                    <span class="paso-numero">2</span>
+                    <span class="paso-titulo">Datos de Tarjeta</span>
+                </div>
+                <div class="paso-linea"></div>
+                <div class="paso-item">
+                    <span class="paso-numero">3</span>
+                    <span class="paso-titulo">Confirmación</span>
+                </div>
+            </div>
+
+            <button class="btn-volver-pago" onclick="abrirSelectorPago()">
+                <i class="fa-solid fa-arrow-left"></i> Cambiar método de pago
+            </button>
+
+            <div class="header-modal-pago">
+                <h2><i class="fa-solid fa-lock" style="color: #2563eb;"></i> Pago Seguro con Tarjeta</h2>
+            </div>
+
+            <form id="formPagoTarjeta">
+                <div class="grupo-form">
+                    <label for="tarjetaNumero"><i class="fa-solid fa-credit-card"></i> Número de Tarjeta *</label>
+                    <div class="input-con-icono">
+                        <input type="text" id="tarjetaNumero" maxlength="19" placeholder="0000 0000 0000 0000"
+                            oninput="actualizarPreviewTarjeta()" required>
+                        <span class="icono-input-derecha" id="iconoCardInput"><i
+                                class="fa-solid fa-credit-card"></i></span>
+                    </div>
+                </div>
+
+                <div class="grupo-form">
+                    <label for="tarjetaNombre"><i class="fa-solid fa-user"></i> Nombre Completo en la Tarjeta *</label>
+                    <input type="text" id="tarjetaNombre" placeholder="Como figura impreso en tu tarjeta"
+                        oninput="actualizarPreviewTarjeta()" required>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="grupo-form">
+                        <label for="tarjetaExp"><i class="fa-solid fa-calendar-days"></i> Expiración (MM/AA) *</label>
+                        <input type="text" id="tarjetaExp" maxlength="5" placeholder="MM/AA"
+                            oninput="validarFormatoExpiracion(this)" required>
+                    </div>
+
+                    <div class="grupo-form">
+                        <label for="tarjetaCvc"><i class="fa-solid fa-lock"></i> Código CVC *</label>
+                        <div class="input-con-icono">
+                            <input type="password" id="tarjetaCvc" maxlength="4" placeholder="123" required>
+                            <span class="icono-input-derecha" style="cursor: pointer;" onclick="toggleVisibilidadCvc()"
+                                title="Ver/Ocultar CVC">
+                                <i class="fa-solid fa-eye" id="iconoOjoCvc"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grupo-form">
+                    <label for="tarjetaCuotas"><i class="fa-solid fa-layer-group"></i> Plan de Cuotas *</label>
+                    <select id="tarjetaCuotas" onchange="calcularDiferidoTarjeta()" required>
+                        <option value="1">Pago Corriente (1 sola cuota)</option>
+                        <option value="3">3 Meses Sin Intereses (Cuotas iguales)</option>
+                        <option value="6">6 Meses Sin Intereses (Cuotas iguales)</option>
+                        <option value="12">12 Meses Con Intereses</option>
+                    </select>
+                </div>
+
+                <div class="grupo-form">
+                    <label for="tarjetaDireccion"><i class="fa-solid fa-house-user"></i> Dirección de Entrega en Ecuador
+                        *</label>
+                    <input type="text" id="tarjetaDireccion"
+                        placeholder="Ciudad, calle principal, secundaria y número de casa/depto" required>
+                </div>
+
+                <div class="grupo-form-checkbox">
+                    <input type="checkbox" id="tarjetaFacturaCheck" onchange="toggleFacturaGenerico('tarjeta')">
+                    <label for="tarjetaFacturaCheck">Deseo factura con datos personalizados</label>
+                </div>
+
+                <div id="boxFacturaTarjeta" class="box-datos-factura" style="display:none;">
+                    <div class="grupo-form">
+                        <label>Nombre o Razón Social *</label>
+                        <input type="text" id="tarjetaFacturaNombre" placeholder="Ej: Carlos Mendoza">
+                    </div>
+                    <div class="grupo-form">
+                        <label>RUC o Cédula *</label>
+                        <input type="text" id="tarjetaFacturaRuc" maxlength="13" placeholder="1712345678">
+                    </div>
+                    <div class="grupo-form">
+                        <label>Dirección para Factura *</label>
+                        <input type="text" id="tarjetaFacturaDireccion" placeholder="Ej: Quito, Ecuador">
+                    </div>
+                </div>
+
+                <div class="acciones-form-pago">
+                    <button type="submit" class="btn-principal btn-block btn-lg btn-pago-human">
+                        <i class="fa-solid fa-lock"></i> Finalizar y Pagar <span id="montoBotonTarjeta">$0.00</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-resumen-pago">
+            <div class="card-resumen-orden">
+                <h3><i class="fa-solid fa-bag-shopping"></i> Resumen de tu Pedido</h3>
+                <div id="listaProductosResumenTarjeta" class="mini-lista-items"></div>
+                <div class="desglose-precios">
+                    <div class="fila-desglose"><span>Subtotal:</span><strong id="subtotalTarjeta">$0.00</strong></div>
+                    <div class="fila-desglose"><span>IVA (15%):</span><strong id="ivaTarjeta">$0.00</strong></div>
+                    <div class="fila-desglose fila-total-destacada"><span>Total a Pagar:</span><strong
+                            id="totalTarjeta">$0.00</strong></div>
+                    <div class="box-cuota-estimada" id="boxCuotaTarjeta">
+                        <span>Tu cuota mensual:</span>
+                        <strong id="cuotaEstimadaTarjeta">$0.00 / mes</strong>
+                    </div>
+                </div>
+                <div class="garantia-badge-box">
+                    <i class="fa-solid fa-shield-check" style="color:#10b981; font-size:18px;"></i>
+                    <div>
+                        <strong>Garantía de Satisfacción</strong>
+                        <p style="margin:0; font-size:11px; color:#64748b;">1 año de soporte técnico y cambios directos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. PANTALLA INDIVIDUAL: TRANSFERENCIA BANCARIA -->
+    <div class="modal-overlay" id="modalPagoTransferencia">
+        <div class="modal-contenedor modal-contenedor-lg">
+            <span class="cerrar-modal" onclick="cerrarTodosModalesPago()">&times;</span>
+
+            <div class="pasos-checkout-bar">
+                <div class="paso-item completado" onclick="abrirSelectorPago()">
+                    <span class="paso-numero"><i class="fa-solid fa-check"></i></span>
+                    <span class="paso-titulo">Forma de Pago</span>
+                </div>
+                <div class="paso-linea completada"></div>
+                <div class="paso-item activo">
+                    <span class="paso-numero">2</span>
+                    <span class="paso-titulo">Datos de Transferencia</span>
+                </div>
+                <div class="paso-linea"></div>
+                <div class="paso-item">
+                    <span class="paso-numero">3</span>
+                    <span class="paso-titulo">Confirmación</span>
+                </div>
+            </div>
+
+            <button class="btn-volver-pago" onclick="abrirSelectorPago()">
+                <i class="fa-solid fa-arrow-left"></i> Cambiar método de pago
+            </button>
+
+            <div class="header-modal-pago">
+                <h2><i class="fa-solid fa-building-columns" style="color: #059669;"></i> Transferencia Bancaria Directa
+                </h2>
+                <p class="text-muted">Copia los datos de cualquiera de nuestras cuentas oficiales para realizar la
+                    transferencia.</p>
+            </div>
+
+            <form id="formPagoTransferencia">
+                <div class="form-grid-2">
+                    <div class="grupo-form">
+                        <label for="transferenciaBanco"><i class="fa-solid fa-landmark"></i> Banco de Origen *</label>
+                        <select id="transferenciaBanco" required>
+                            <option value="Banco Pichincha">Banco Pichincha</option>
+                            <option value="Banco Guayaquil">Banco Guayaquil</option>
+                            <option value="Produbanco">Produbanco</option>
+                            <option value="Banco del Pacífico">Banco del Pacífico</option>
+                            <option value="Banco Internacional">Banco Internacional</option>
+                            <option value="Otro Banco">Otro Banco o Cooperativa</option>
+                        </select>
+                    </div>
+
+                    <div class="grupo-form">
+                        <label for="transferenciaComprobante"><i class="fa-solid fa-receipt"></i> N° de
+                            Comprobante</label>
+                        <input type="text" id="transferenciaComprobante" placeholder="Ej: 98765432" required>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="grupo-form">
+                        <label for="transferenciaTitular"><i class="fa-solid fa-user"></i> Nombre del Titular</label>
+                        <input type="text" id="transferenciaTitular" placeholder="Quien realiza la transferencia"
+                            required>
+                    </div>
+
+                    <div class="grupo-form">
+                        <label for="transferenciaRuc"><i class="fa-solid fa-id-card"></i> Cédula</label>
+                        <input type="text" id="transferenciaRuc" maxlength="13" placeholder="1712345678" required>
+                    </div>
+                </div>
+
+                <div class="grupo-form">
+                    <label for="transferenciaDireccion"><i class="fa-solid fa-house-user"></i> Dirección de Entrega en
+                        Ecuador</label>
+                    <input type="text" id="transferenciaDireccion" placeholder="Ciudad, dirección exacta de entrega"
+                        required>
+                </div>
+
+                <div class="grupo-form-checkbox">
+                    <input type="checkbox" id="transferenciaFacturaCheck"
+                        onchange="toggleFacturaGenerico('transferencia')">
+                    <label for="transferenciaFacturaCheck">Deseo factura con datos personalizados</label>
+                </div>
+
+                <div id="boxFacturaTransferencia" class="box-datos-factura" style="display:none;">
+                    <div class="grupo-form">
+                        <label>Nombre o Razón Social *</label>
+                        <input type="text" id="transferenciaFacturaNombre" placeholder="Ej: Carlos Mendoza">
+                    </div>
+                    <div class="grupo-form">
+                        <label>RUC o Cédula *</label>
+                        <input type="text" id="transferenciaFacturaRuc" maxlength="13" placeholder="1712345678">
+                    </div>
+                    <div class="grupo-form">
+                        <label>Dirección para Factura *</label>
+                        <input type="text" id="transferenciaFacturaDireccion" placeholder="Ej: Quito, Ecuador">
+                    </div>
+                </div>
+
+                <div class="acciones-form-pago">
+                    <button type="submit" class="btn-principal btn-block btn-lg btn-pago-human">
+                        <i class="fa-solid fa-check"></i> Confirmar Transferencia de <span
+                            id="montoBotonTransferencia">$0.00</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-resumen-pago">
+            <div class="card-resumen-orden">
+                <h3><i class="fa-solid fa-bag-shopping"></i> Resumen del Pedido</h3>
+                <div id="listaProductosResumenTransferencia" class="mini-lista-items"></div>
+                <div class="desglose-precios">
+                    <div class="fila-desglose"><span>Subtotal:</span><strong id="subtotalTransferencia">$0.00</strong>
+                    </div>
+                    <div class="fila-desglose"><span>IVA (15%):</span><strong id="ivaTransferencia">$0.00</strong></div>
+                    <div class="fila-desglose fila-total-destacada"><span>Total a Transferir:</span><strong
+                            id="totalTransferencia">$0.00</strong></div>
+                </div>
+                <div class="info-nota-pago">
+                    <i class="fa-solid fa-circle-check"></i> Tu transferencia será verificada rápidamente por nuestro
+                    equipo en menos de 15 minutos.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. PANTALLA INDIVIDUAL: PAGO CONTRA ENTREGA EN EFECTIVO -->
+    <div class="modal-overlay" id="modalPagoEfectivo">
+        <div class="modal-contenedor modal-contenedor-lg">
+            <span class="cerrar-modal" onclick="cerrarTodosModalesPago()">&times;</span>
+
+            <div class="pasos-checkout-bar">
+                <div class="paso-item completado" onclick="abrirSelectorPago()">
+                    <span class="paso-numero"><i class="fa-solid fa-check"></i></span>
+                    <span class="paso-titulo">Forma de Pago</span>
+                </div>
+                <div class="paso-linea completada"></div>
+                <div class="paso-item activo">
+                    <span class="paso-numero">2</span>
+                    <span class="paso-titulo">Entrega y Efectivo</span>
+                </div>
+                <div class="paso-linea"></div>
+                <div class="paso-item">
+                    <span class="paso-numero">3</span>
+                    <span class="paso-titulo">Confirmación</span>
+                </div>
+            </div>
+
+            <button class="btn-volver-pago" onclick="abrirSelectorPago()">
+                <i class="fa-solid fa-arrow-left"></i> Cambiar método de pago
+            </button>
+
+            <div class="header-modal-pago">
+                <h2><i class="fa-solid fa-money-bill-wave" style="color: #1fd906;"></i> Pago Entrega en Efectivo</h2>
+            </div>
+
+            <form id="formPagoEfectivo">
+                <div class="grupo-form">
+                    <label for="efectivoDireccion"><i class="fa-solid fa-house-user"></i> Dirección Exacta de Entrega
+                        *</label>
+                    <input type="text" id="efectivoDireccion"
+                        placeholder="Ej: Av. Shyris N32-15 y Portugal, Dpto 4B, Quito" required>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="grupo-form">
+                        <label for="efectivoTelefono"><i class="fa-solid fa-mobile-screen-button"></i> Teléfono Móvil de
+                            Contacto *</label>
+                        <input type="tel" id="efectivoTelefono" maxlength="10" placeholder="0991234567" required>
+                    </div>
+
+                    <div class="grupo-form">
+                        <label for="efectivoHorario"><i class="fa-solid fa-clock"></i> Horario de Entrega Preferido
+                            *</label>
+                        <select id="efectivoHorario" required>
+                            <option value="Mañana (09:00 - 13:00)">Mañana (09:00 - 13:00)</option>
+                            <option value="Tarde (14:00 - 18:00)">Tarde (14:00 - 18:00)</option>
+                            <option value="Cualquier Horario">Cualquier Horario</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="box-calculador-cambio">
+                    <h4><i class="fa-solid fa-wallet"></i> ¿Con cuánto dinero en efectivo vas a pagar?</h4>
+                    <p class="subtexto-cambio">Selecciona un billete o ingresa el monto exacto para llevar tu vuelto
+                        listo:</p>
+
+                    <div class="form-grid-2" style="margin-top:14px;">
+                        <div class="grupo-form" style="margin-bottom:0;">
+                            <label for="efectivoMontoConQuePaga">Monto abonado ($ USD) *</label>
+                            <input type="number" step="0.01" id="efectivoMontoConQuePaga" placeholder="Ej: 100.00"
+                                oninput="calcularCambioEfectivo()" required>
+                        </div>
+                        <div class="resultado-cambio-box">
+                            <span>Vuelto / Cambio a recibir:</span>
+                            <strong id="montoCambioEfectivo">$0.00</strong>
+                        </div>
+                    </div>
+                    <small id="mensajeCambioEfectivo" class="text-muted" style="margin-top:6px; display:block;">El
+                        mensajero llevará tu cambio listo en efectivo.</small>
+                </div>
+
+                <div class="grupo-form" style="margin-top:15px;">
+                    <label for="efectivoNotas"><i class="fa-solid fa-message"></i> Indicaciones adicionales para el
+                        Repartidor</label>
+                    <textarea id="efectivoNotas" rows="2"
+                        placeholder="Ej: Dejar con el guardia de garita / Timbre 3B / Casa blanca de dos pisos"></textarea>
+                </div>
+
+                <div class="grupo-form-checkbox">
+                    <input type="checkbox" id="efectivoFacturaCheck" onchange="toggleFacturaGenerico('efectivo')">
+                    <label for="efectivoFacturaCheck">Deseo factura con datos personalizados</label>
+                </div>
+
+                <div id="boxFacturaEfectivo" class="box-datos-factura" style="display:none;">
+                    <div class="grupo-form">
+                        <label>Nombre o Razón Social *</label>
+                        <input type="text" id="efectivoFacturaNombre" placeholder="Ej: Carlos Mendoza">
+                    </div>
+                    <div class="grupo-form">
+                        <label>RUC o Cédula *</label>
+                        <input type="text" id="efectivoFacturaRuc" maxlength="13" placeholder="1712345678">
+                    </div>
+                    <div class="grupo-form">
+                        <label>Dirección para Factura *</label>
+                        <input type="text" id="efectivoFacturaDireccion" placeholder="Ej: Quito, Ecuador">
+                    </div>
+                </div>
+
+                <div class="acciones-form-pago">
+                    <button type="submit" class="btn-principal btn-block btn-lg btn-pago-human">
+                        <i class="fa-solid fa-box-check"></i> Confirmar Pedido en Efectivo (<span
+                            id="montoBotonEfectivo">$0.00</span>)
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-resumen-pago">
+            <div class="card-resumen-orden">
+                <h3><i class="fa-solid fa-bag-shopping"></i> Resumen del Pedido</h3>
+                <div id="listaProductosResumenEfectivo" class="mini-lista-items"></div>
+                <div class="desglose-precios">
+                    <div class="fila-desglose"><span>Subtotal:</span><strong id="subtotalEfectivo">$0.00</strong></div>
+                    <div class="fila-desglose"><span>IVA (15%):</span><strong id="ivaEfectivo">$0.00</strong></div>
+                    <div class="fila-desglose fila-total-destacada"><span>Total a Pagar:</span><strong
+                            id="totalEfectivo">$0.00</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ver Recibo Compras -->
+    <div class="modal-overlay" id="modalDetalleVenta">
+        <div class="modal-contenedor">
+            <span class="cerrar-modal" onclick="cerrarModalDetalleVenta()">&times;</span>
+            <div id="contenidoDetalleVenta"></div>
+            <div style="margin-top:20px; text-align:right;">
+                <button class="btn-secundario" onclick="cerrarModalDetalleVenta()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Principal y Funciones de Utilidad para Tarjeta -->
+    <script src="app.js"></script>
+    <script>
+        // Función para auto-completar el slash (/) en la fecha de la tarjeta (MM/AA)
+        function validarFormatoExpiracion(input) {
+            let valor = input.value.replace(/\D/g, '');
+            if (valor.length >= 3) {
+                input.value = valor.slice(0, 2) + '/' + valor.slice(2, 4);
+            } else {
+                input.value = valor;
+            }
+        }
+
+        // Función para alternar la visibilidad del código CVC (Ojito)
+        function toggleVisibilidadCvc() {
+            const inputCvc = document.getElementById('tarjetaCvc');
+            const iconoOjo = document.getElementById('iconoOjoCvc');
+
+            if (inputCvc.type === 'password') {
+                inputCvc.type = 'text';
+                iconoOjo.classList.remove('fa-eye');
+                iconoOjo.classList.add('fa-eye-slash');
+            } else {
+                inputCvc.type = 'password';
+                iconoOjo.classList.remove('fa-eye-slash');
+                iconoOjo.classList.add('fa-eye');
+            }
+        }
+
+        /**
+         * IMPORTANTE: Agrega o asegúrate de que al finalizar una compra exitosa 
+         * en tu archivo app.js, ejecutes una función similar a esta para limpiar el contador:
+         */
+        function limpiarCarritoDespuesDePago() {
+            // Asumiendo que tu variable global de carrito es un array o localStorage:
+            // carrito = [];
+            // localStorage.setItem('carrito', JSON.stringify([]));
+
+            // Actualizar visualmente el badge a 0
+            const badges = document.querySelectorAll('.badge-count-carrito');
+            badges.forEach(badge => {
+                badge.textContent = '0';
+            });
+        }
+    </script>
+</body>
+
+</html>

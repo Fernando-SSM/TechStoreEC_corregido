@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - TechStore EC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="layout-admin">
+        <!-- Sidebar Navegación Lateral -->
+        <aside class="sidebar-admin">
+            <div>
+                <div class="sidebar-brand">
+                    <h2><i class="fa-solid fa-laptop-code"></i> <span>TechStore</span></h2>
+                    <p>Panel Administrativo v2.5</p>
+                </div>
+                <ul class="menu-sidebar">
+                    <li class="activo" onclick="mostrarSeccionAdmin('dashboard', this)">
+                        <i class="fa-solid fa-chart-line"></i> <span>Dashboard</span>
+                    </li>
+                    <li onclick="mostrarSeccionAdmin('productos', this)">
+                        <i class="fa-solid fa-boxes-stacked"></i> <span>Inventario Equipos</span>
+                    </li>
+                    <li onclick="mostrarSeccionAdmin('categorias', this)">
+                        <i class="fa-solid fa-tags"></i> <span>Categorías</span>
+                    </li>
+                    <li onclick="mostrarSeccionAdmin('ventas', this)">
+                        <i class="fa-solid fa-cart-shopping"></i> <span>Órdenes de Venta</span>
+                    </li>
+                    <li onclick="mostrarSeccionAdmin('clientes', this)">
+                        <i class="fa-solid fa-users"></i> <span>Directorio Clientes</span>
+                    </li>
+                    <li>
+                        <a href="proveedores.html"
+                            style="display:flex; align-items:center; gap:14px; width:100%; color:inherit;">
+                            <i class="fa-solid fa-truck-ramp-box"></i> <span>Proveedores</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="reportes.html"
+                            style="display:flex; align-items:center; gap:14px; width:100%; color:inherit;">
+                            <i class="fa-solid fa-file-invoice-dollar"></i> <span>Reportes & Finanzas</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="btn-peligro btn-block" style="border-radius: 8px;" onclick="cerrarSesion()">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Contenido Principal Administrativo -->
+        <main class="contenido-admin">
+            <header class="topbar-admin">
+                <h1 id="tituloSeccionTop">Dashboard General</h1>
+                <div class="user-badge-admin">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span id="nombreAdminSidebar">Administrador General</span>
+                </div>
+            </header>
+
+            <!-- SECCIÓN 1: DASHBOARD -->
+            <section id="dashboard" class="seccion-admin">
+                <div class="grid-kpi">
+                    <div class="card-kpi">
+                        <div class="kpi-icono kpi-blue"><i class="fa-solid fa-box-open"></i></div>
+                        <div class="kpi-data">
+                            <h3 id="dashTotalProd">0</h3>
+                            <p>Total Equipos</p>
+                        </div>
+                    </div>
+                    <div class="card-kpi">
+                        <div class="kpi-icono kpi-green"><i class="fa-solid fa-sack-dollar"></i></div>
+                        <div class="kpi-data">
+                            <h3 id="dashTotalVentas">$0.00</h3>
+                            <p>Ingresos por Ventas</p>
+                        </div>
+                    </div>
+                    <div class="card-kpi">
+                        <div class="kpi-icono kpi-orange"><i class="fa-solid fa-users-gear"></i></div>
+                        <div class="kpi-data">
+                            <h3 id="dashTotalCli">0</h3>
+                            <p>Clientes Registrados</p>
+                        </div>
+                    </div>
+                    <div class="card-kpi">
+                        <div class="kpi-icono kpi-red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="kpi-data">
+                            <h3 id="dashStockBajo">0</h3>
+                            <p>Equipos Stock Bajo</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="header-seccion"
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h2>Últimas Ventas Registradas</h2>
+                </div>
+                <div class="tabla-contenedor">
+                    <table id="tablaUltimasVentas">
+                        <thead>
+                            <tr>
+                                <th># Venta</th>
+                                <th>Cliente</th>
+                                <th>Fecha & Hora</th>
+                                <th>Monto Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="header-seccion" style="display:flex; justify-content:space-between; align-items:center; margin:30px 0 15px;">
+                    <h2>Clientes Registrados Recientemente</h2>
+                </div>
+                <div class="tabla-contenedor">
+                    <table id="tablaUltimosClientes">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente / Usuario</th>
+                                <th>Correo Electrónico</th>
+                                <th>Fecha de Registro</th>
+                                <th>Pedidos</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 2: INVENTARIO DE PRODUCTOS (CRUD) -->
+            <section id="productos" class="seccion-admin oculto">
+                <div class="topbar-admin" style="border:none; margin-bottom:20px;">
+                    <div>
+                        <h2>Gestión de Equipos Tecnológicos</h2>
+                        <p class="text-muted">Administra el inventario de Laptops, PC Gamer, accesorios y componentes.
+                        </p>
+                    </div>
+                    <button class="btn-principal" onclick="abrirModalProducto(false)">
+                        <i class="fa-solid fa-circle-plus"></i> Nuevo Equipo
+                    </button>
+                </div>
+
+                <!-- Buscador de inventario -->
+                <div class="barra-filtros-cliente" style="margin-bottom: 20px;">
+                    <div class="input-buscar-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Buscar equipo por nombre o modelo..."
+                            onkeyup="renderTablaProductosAdmin(this.value)">
+                    </div>
+                </div>
+
+                <div class="tabla-contenedor">
+                    <table id="tablaProductosAdmin">
+                        <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Producto / Modelo</th>
+                                <th>Categoría</th>
+                                <th>Precio ($)</th>
+                                <th>Stock Actual</th>
+                                <th>Proveedor</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 3: CATEGORÍAS -->
+            <section id="categorias" class="seccion-admin oculto">
+                <h2>Categorías de Productos</h2>
+                <p class="text-muted">Crea nuevas líneas de negocio para organizar tus productos.</p>
+
+                <div style="margin:20px 0;">
+                    <a href="nueva-categoria.html" class="btn-principal"><i class="fa-solid fa-plus"></i> Agregar
+                        Categoría</a>
+                </div>
+
+                <div id="gridCategoriasAdmin" class="grid-categorias-admin"></div>
+            </section>
+
+            <!-- SECCIÓN 4: ÓRDENES DE VENTA -->
+            <section id="ventas" class="seccion-admin oculto">
+                <h2>Historial y Control de Ventas</h2>
+                <p class="text-muted">Gestiona el estado de entrega y pedidos realizados por los clientes.</p>
+
+                <div class="tabla-contenedor" style="margin-top:20px;">
+                    <table id="tablaVentasAdmin">
+                        <thead>
+                            <tr>
+                                <th># Orden</th>
+                                <th>Cliente</th>
+                                <th>Fecha & Hora</th>
+                                <th>Método Pago</th>
+                                <th>Total</th>
+                                <th>Estado Entrega</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 5: CLIENTES REGISTRADOS -->
+            <section id="clientes" class="seccion-admin oculto">
+                <h2>Directorio de Clientes Registrados</h2>
+                <p class="text-muted">Listado de usuarios registrados en el sistema y sus historiales.</p>
+
+                <div class="tabla-contenedor" style="margin-top:20px;">
+                    <table id="tablaClientesAdmin">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente / Usuario</th>
+                                <th>Correo Electrónico</th>
+                                <th>Teléfono Contacto</th>
+                                <th>Pedidos Realizados</th>
+                                <th>Total Compras ($)</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modalCategoriaAdmin">
+        <div class="modal-contenedor">
+            <span class="cerrar-modal" onclick="cerrarModalCategoriaAdmin()">&times;</span>
+            <h2>Actualizar Categoría</h2>
+            <form id="formEditarCategoriaAdmin" style="margin-top:20px;">
+                <input type="hidden" id="idCategoriaAdmin">
+                <div class="grupo-form">
+                    <label for="nombreEditarCategoriaAdmin">Nombre de Categoría</label>
+                    <input type="text" id="nombreEditarCategoriaAdmin" required>
+                </div>
+                <div class="grupo-form">
+                    <label for="descEditarCategoriaAdmin">Descripción Breve</label>
+                    <input type="text" id="descEditarCategoriaAdmin">
+                </div>
+                <div style="display:flex; gap:15px; margin-top:20px;">
+                    <button type="submit" class="btn-principal btn-block"><i class="fa-solid fa-pen-to-square"></i>
+                        Actualizar Categoría</button>
+                    <button type="button" class="btn-secundario" onclick="cerrarModalCategoriaAdmin()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Formulario Editar Cliente -->
+    <div class="modal-overlay" id="modalClienteAdmin">
+        <div class="modal-contenedor">
+            <span class="cerrar-modal" onclick="cerrarModalClienteAdmin()">&times;</span>
+            <h2>Editar Cliente Registrado</h2>
+            <form id="formClienteAdmin" style="margin-top:20px;">
+                <input type="hidden" id="idClienteAdmin">
+                <div class="grupo-form">
+                    <label for="nombreClienteAdmin">Nombre Completo</label>
+                    <input type="text" id="nombreClienteAdmin" required>
+                </div>
+                <div class="grupo-form">
+                    <label for="usuarioClienteAdmin">Usuario</label>
+                    <input type="text" id="usuarioClienteAdmin" required>
+                </div>
+                <div class="grupo-form">
+                    <label for="correoClienteAdmin">Correo Electrónico</label>
+                    <input type="email" id="correoClienteAdmin" required>
+                </div>
+                <div class="grupo-form">
+                    <label for="telefonoClienteAdmin">Teléfono</label>
+                    <input type="tel" id="telefonoClienteAdmin" maxlength="10" placeholder="0987654321">
+                </div>
+                <div class="grupo-form">
+                    <label for="direccionClienteAdmin">Dirección</label>
+                    <input type="text" id="direccionClienteAdmin" placeholder="Dirección de entrega">
+                </div>
+                <div style="display:flex; gap:15px; margin-top:20px;">
+                    <button type="submit" class="btn-principal btn-block"><i class="fa-solid fa-floppy-disk"></i>
+                        Actualizar Cliente</button>
+                    <button type="button" class="btn-secundario" onclick="cerrarModalClienteAdmin()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Formulario Agregar / Editar Producto -->
+    <div class="modal-overlay" id="modalProductoAdmin">
+        <div class="modal-contenedor modal-contenedor-lg">
+            <span class="cerrar-modal" onclick="cerrarModalProductoAdmin()">&times;</span>
+            <h2 id="tituloModalProdAdmin">Agregar Equipo Tecnológico</h2>
+            <form id="formProductoAdmin" style="margin-top:20px;">
+                <input type="hidden" id="idProdAdmin">
+
+                <div class="form-grid-2">
+                    <div class="grupo-form">
+                        <label for="nombreProdAdmin">Nombre del Equipo / Modelo *</label>
+                        <input type="text" id="nombreProdAdmin" placeholder="Ej: Laptop Dell XPS 15" required>
+                    </div>
+                    <div class="grupo-form">
+                        <label for="catProdAdmin">Categoría *</label>
+                        <select id="catProdAdmin" required></select>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="grupo-form">
+                        <label for="precioProdAdmin">Precio de Venta ($ USD) *</label>
+                        <input type="number" step="0.01" id="precioProdAdmin" placeholder="0.00" required>
+                    </div>
+                    <div class="grupo-form">
+                        <label for="stockProdAdmin">Stock / Unidades Disponibles *</label>
+                        <input type="number" id="stockProdAdmin" placeholder="0" required>
+                    </div>
+                </div>
+
+                <div class="grupo-form">
+                    <label for="imagenProdAdmin">URL Imagen HD del Producto</label>
+                    <input type="url" id="imagenProdAdmin" placeholder="https://images.unsplash.com/photo-..." required>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="grupo-form">
+                        <label for="provProdAdmin">Proveedor de Origen</label>
+                        <input type="text" id="provProdAdmin" placeholder="Ej: ASUS Ecuador S.A.">
+                    </div>
+                    <div class="grupo-form">
+                        <label for="descProdAdmin">Especificaciones Técnicas</label>
+                        <input type="text" id="descProdAdmin" placeholder="Ej: Intel i7, 16GB RAM, 512GB SSD">
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:15px; margin-top:20px;">
+                    <button type="submit" class="btn-principal btn-block"><i class="fa-solid fa-floppy-disk"></i>
+                        Guardar Producto</button>
+                    <button type="button" class="btn-secundario" onclick="cerrarModalProductoAdmin()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Detalle de Venta -->
+    <div class="modal-overlay" id="modalDetalleVenta">
+        <div class="modal-contenedor">
+            <span class="cerrar-modal" onclick="cerrarModalDetalleVenta()">&times;</span>
+            <div id="contenidoDetalleVenta"></div>
+            <div style="margin-top:20px; text-align:right;">
+                <button class="btn-secundario" onclick="cerrarModalDetalleVenta()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Principal -->
+    <script src="app.js"></script>
+</body>
+
+</html>

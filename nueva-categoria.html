@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Categoría - TechStore EC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="contenido-admin" style="max-width:900px; margin:0 auto; min-height:100vh; padding:40px 25px;">
+        <header class="topbar-admin" style="margin-bottom:30px;">
+            <div>
+                <h1>Nueva Categoría</h1>
+                <p class="text-muted">Registra una nueva categoría para organizar los productos.</p>
+            </div>
+            <a href="admin.html" class="btn-secundario"><i class="fa-solid fa-arrow-left"></i> Volver</a>
+        </header>
+        <section style="background:white; padding:25px; border-radius:var(--radius-lg); border:1px solid var(--border-color);">
+            <form id="formCategoriaAdmin" class="form-grid-2">
+                <div class="grupo-form">
+                    <label for="nombreCatAdmin">Nombre de Categoría</label>
+                    <input type="text" id="nombreCatAdmin" placeholder="Ej: Impresoras y Drones" required>
+                </div>
+                <div class="grupo-form">
+                    <label for="descCatAdmin">Descripción Breve</label>
+                    <input type="text" id="descCatAdmin" placeholder="Descripción breve para los clientes">
+                </div>
+                <div style="grid-column:1/-1; display:flex; gap:15px; flex-wrap:wrap;">
+                    <button type="submit" class="btn-principal"><i class="fa-solid fa-floppy-disk"></i> Guardar Categoría</button>
+                    <a href="admin.html" class="btn-secundario">Cancelar</a>
+                </div>
+            </form>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>

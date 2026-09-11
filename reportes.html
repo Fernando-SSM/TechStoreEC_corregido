@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes Financieros - TechStore EC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="layout-admin">
+        <!-- Sidebar Navegación Lateral -->
+        <aside class="sidebar-admin">
+            <div>
+                <div class="sidebar-brand">
+                    <h2><i class="fa-solid fa-laptop-code"></i> <span>TechStore</span></h2>
+                    <p>Panel Administrativo</p>
+                </div>
+                <ul class="menu-sidebar">
+                    <li>
+                        <a href="admin.html" style="display:flex; align-items:center; gap:14px; width:100%; color:inherit;">
+                            <i class="fa-solid fa-chart-line"></i> <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin.html" style="display:flex; align-items:center; gap:14px; width:100%; color:inherit;">
+                            <i class="fa-solid fa-boxes-stacked"></i> <span>Inventario Equipos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="proveedores.html" style="display:flex; align-items:center; gap:14px; width:100%; color:inherit;">
+                            <i class="fa-solid fa-truck-ramp-box"></i> <span>Proveedores</span>
+                        </a>
+                    </li>
+                    <li class="activo">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> <span>Reportes & Finanzas</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="btn-peligro btn-block" onclick="cerrarSesion()">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="contenido-admin">
+            <header class="topbar-admin">
+                <h1>Reportes Financieros y Análisis</h1>
+                <div class="user-badge-admin">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Finanzas & Estadísticas</span>
+                </div>
+            </header>
+
+            <!-- Tarjetas Resumen de Balance -->
+            <div class="grid-kpi" style="margin-bottom:30px;">
+                <div class="card-kpi">
+                    <div class="kpi-icono kpi-green"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                    <div class="kpi-data">
+                        <h3 id="repIngresos">$0.00</h3>
+                        <p>Total Ingresos (Ventas)</p>
+                    </div>
+                </div>
+
+                <div class="card-kpi">
+                    <div class="kpi-icono kpi-red"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                    <div class="kpi-data">
+                        <h3 id="repEgresos">$0.00</h3>
+                        <p>Total Egresos (Compras Stock)</p>
+                    </div>
+                </div>
+
+                <div class="card-kpi">
+                    <div class="kpi-icono kpi-blue"><i class="fa-solid fa-scale-balanced"></i></div>
+                    <div class="kpi-data">
+                        <h3 id="repGanancia">$0.00</h3>
+                        <p>Ganancia Neta Estimada</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección Imprimir / Exportar Reporte -->
+            <div style="background:white; padding:25px; border-radius:var(--radius-lg); border:1px solid var(--border-color); margin-bottom:30px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h3><i class="fa-solid fa-print"></i> Exportar Informe Ejecutivo</h3>
+                    <p class="text-muted">Genera una copia en PDF o imprime el balance de ventas e inventario actual.</p>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+                    <button class="btn-secundario" onclick="actualizarReportes()"><i class="fa-solid fa-arrows-rotate"></i> Actualizar reporte</button>
+                    <button class="btn-principal" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> Imprimir Reporte</button>
+                </div>
+            </div>
+
+            <!-- Productos Más Vendidos -->
+            <section style="background:white; padding:25px; border-radius:var(--radius-lg); border:1px solid var(--border-color);">
+                <h2><i class="fa-solid fa-crown" style="color:#f59e0b;"></i> Top Equipos Tecnológicos Más Vendidos</h2>
+                <p class="text-muted" style="margin-bottom:20px;">Ranking de los productos con mayor demanda por parte de los clientes.</p>
+
+                <div class="tabla-contenedor">
+                    <table id="tablaTopVendidos">
+                        <thead>
+                            <tr>
+                                <th>Posición</th>
+                                <th>Equipo / Producto</th>
+                                <th>Unidades Vendidas</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JS Principal -->
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Proveedores - TechStore EC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="layout-admin">
+        <!-- Sidebar Navegación Lateral -->
+        <aside class="sidebar-admin">
+            <div>
+                <div class="sidebar-brand">
+                    <h2><i class="fa-solid fa-laptop-code"></i> <span>TechStore</span></h2>
+                    <p>Panel Administrativo</p>
+                </div>
+                <ul class="menu-sidebar">
+                    <li>
+                        <a href="admin.html" style="display:flex; align-items:center; gap:14px; width:100%; color:inherit;">
+                            <i class="fa-solid fa-chart-line"></i> <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="admin.html" style="display:flex; align-items:center; gap:14px; width:100%; color:inherit;">
+                            <i class="fa-solid fa-boxes-stacked"></i> <span>Inventario Equipos</span>
+                        </a>
+                    </li>
+                    <li class="activo">
+                        <i class="fa-solid fa-truck-ramp-box"></i> <span>Proveedores</span>
+                    </li>
+                    <li>
+                        <a href="reportes.html" style="display:flex; align-items:center; gap:14px; width:100%; color:inherit;">
+                            <i class="fa-solid fa-file-invoice-dollar"></i> <span>Reportes & Finanzas</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="btn-peligro btn-block" onclick="cerrarSesion()">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="contenido-admin">
+            <header class="topbar-admin">
+                <h1>Gestión de Proveedores de Tecnología</h1>
+                <div class="user-badge-admin">
+                    <i class="fa-solid fa-building-user"></i>
+                    <span>Módulo Proveedores</span>
+                </div>
+            </header>
+
+            <!-- Registro de Nuevo Proveedor -->
+            <section style="background:white; padding:25px; border-radius:var(--radius-lg); border:1px solid var(--border-color); margin-bottom:30px;">
+                <h3><i class="fa-solid fa-plus-circle"></i> Registrar Nuevo Proveedor Tecnológico</h3>
+                <p class="text-muted" style="margin-bottom: 20px;">Agregue fabricantes y mayoristas autorizados de equipos en Ecuador.</p>
+                
+                <a href="nuevo-proveedor.html" class="btn-principal"><i class="fa-solid fa-plus"></i> Registrar Nuevo Proveedor</a>
+                <!-- El formulario de alta se encuentra en nuevo-proveedor.html. -->
+                <form id="formProveedor" class="form-grid-2 oculto">
+                    <input type="hidden" id="idProveedor">
+                    <div class="grupo-form">
+                        <label for="provNombre">Nombre de la Empresa / Distribuidor *</label>
+                        <input type="text" id="provNombre" placeholder="Ej: ASUS Ecuador S.A." required>
+                    </div>
+                    <div class="grupo-form">
+                        <label for="provRuc">RUC de la Empresa *</label>
+                        <input type="tel" id="provRuc" placeholder="Ej: 1792345678" required maxlength="10" pattern="\d{10}" title="Debe contener exactamente 10 dígitos numéricos">
+                    </div>
+                    <div class="grupo-form">
+                        <label for="provContacto">Persona de Contacto</label>
+                        <input type="text" id="provContacto" placeholder="Ej: Ing. Roberto Paz">
+                    </div>
+                    <div class="grupo-form">
+                        <label for="provTelefono">Teléfono de Contacto</label>
+                        <input type="tel" id="provTelefono" placeholder="0987654321" maxlength="10" pattern="\d{10}" title="Debe contener exactamente 10 dígitos numéricos">
+                    </div>
+                    <div class="grupo-form">
+                        <label for="provCorreo">Correo Electrónico</label>
+                        <input type="email" id="provCorreo" placeholder="ventas@empresa.com.ec">
+                    </div>
+                    <div class="grupo-form">
+                        <label for="provCiudad">Ciudad Principal</label>
+                        <input type="text" id="provCiudad" placeholder="Ej: Quito / Guayaquil">
+                    </div>
+                    <div style="grid-column: 1/-1;">
+                        <button type="submit" class="btn-principal" id="btnGuardarProveedor"><i class="fa-solid fa-floppy-disk"></i> Guardar Proveedor</button>
+                        <button type="button" class="btn-secundario oculto" id="btnCancelarEditarProveedor" onclick="cancelarEditarProveedor()">Cancelar actualización</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Tabla Directorio Proveedores -->
+            <section style="margin-bottom:40px;">
+                <h2>Directorio de Proveedores Registrados</h2>
+                <div class="tabla-contenedor" style="margin-top:15px;">
+                    <table id="tablaProveedores">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Empresa</th>
+                                <th>RUC</th>
+                                <th>Contacto</th>
+                                <th>Teléfono / Correo</th>
+                                <th>Ciudad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Compras de Stock a Proveedores -->
+            <section style="background:white; padding:25px; border-radius:var(--radius-lg); border:1px solid var(--border-color);">
+                <h3><i class="fa-solid fa-cart-flatbed"></i> Registro de Compras de Stock (Egresos)</h3>
+                <p class="text-muted" style="margin-bottom: 20px;">Registra lotes de mercadería comprados a distribuidores para reabastecer el inventario.</p>
+
+                <a href="nuevo-ingreso-stock.html" class="btn-principal" style="margin-bottom:25px;"><i class="fa-solid fa-plus"></i> Registrar Ingreso de Stock</a>
+                <form id="formCompraStock" class="form-grid-2 oculto" style="margin-bottom:25px;">
+                    <input type="hidden" id="idCompraStock">
+                    <div class="grupo-form">
+                        <label for="compraProveedorSelect">Seleccionar Proveedor</label>
+                        <select id="compraProveedorSelect" required>
+                            <option value="ASUS Ecuador S.A.">ASUS Ecuador S.A.</option>
+                            <option value="Tech Import Lenovo EC">Tech Import Lenovo EC</option>
+                            <option value="Componentes PC Master">Componentes PC Master</option>
+                        </select>
+                    </div>
+                    <div class="grupo-form">
+                        <label for="compraMontoTotal">Monto Total Invertido ($ USD)</label>
+                        <input type="number" step="0.01" id="compraMontoTotal" placeholder="0.00" required>
+                    </div>
+                    <div class="grupo-form" style="grid-column: 1/-1;">
+                        <label for="compraDetalleText">Detalle de la Compra / Mercadería</label>
+                        <input type="text" id="compraDetalleText" placeholder="Ej: Lote de 10 Laptops ASUS ROG y 5 Mouses Gamer" required>
+                    </div>
+                    <div style="grid-column: 1/-1;">
+                        <button type="submit" class="btn-principal" id="btnGuardarCompraStock"><i class="fa-solid fa-receipt"></i> Registrar Ingreso de Stock</button>
+                        <button type="button" class="btn-secundario oculto" id="btnCancelarEditarCompra" onclick="cancelarEditarCompraStock()">Cancelar actualización</button>
+                    </div>
+                </form>
+
+                <h4>Historial de Compras de Stock</h4>
+                <div class="tabla-contenedor" style="margin-top:15px;">
+                    <table id="tablaComprasStock">
+                        <thead>
+                            <tr>
+                                <th># Ingreso</th>
+                                <th>Proveedor</th>
+                                <th>Fecha</th>
+                                <th>Detalle de Mercadería</th>
+                                <th>Inversión ($)</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JS Principal -->
+    <script src="app.js"></script>
+</body>
+
+</html>

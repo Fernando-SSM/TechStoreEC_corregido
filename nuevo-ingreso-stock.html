@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Ingreso de Stock - TechStore EC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="contenido-admin" style="max-width:900px; margin:0 auto; min-height:100vh; padding:40px 25px;">
+        <header class="topbar-admin" style="margin-bottom:30px;">
+            <div>
+                <h1>Registrar Ingreso de Stock</h1>
+                <p class="text-muted">Registra una compra de mercadería a un proveedor.</p>
+            </div>
+            <a href="proveedores.html" class="btn-secundario"><i class="fa-solid fa-arrow-left"></i> Volver</a>
+        </header>
+        <section style="background:white; padding:25px; border-radius:var(--radius-lg); border:1px solid var(--border-color);">
+            <form id="formCompraStock" class="form-grid-2">
+                <input type="hidden" id="idCompraStock">
+                <div class="grupo-form">
+                    <label for="compraProveedorSelect">Seleccionar Proveedor</label>
+                    <select id="compraProveedorSelect" required></select>
+                </div>
+                <div class="grupo-form">
+                    <label for="compraMontoTotal">Monto Total Invertido ($ USD)</label>
+                    <input type="number" step="0.01" min="0" id="compraMontoTotal" placeholder="0.00" required>
+                </div>
+                <div class="grupo-form" style="grid-column:1/-1;">
+                    <label for="compraDetalleText">Detalle de la Compra / Mercadería</label>
+                    <input type="text" id="compraDetalleText" placeholder="Ej: Lote de 10 Laptops ASUS ROG" required>
+                </div>
+                <div style="grid-column:1/-1; display:flex; gap:15px; flex-wrap:wrap;">
+                    <button type="submit" class="btn-principal" id="btnGuardarCompraStock"><i class="fa-solid fa-receipt"></i> Guardar Ingreso de Stock</button>
+                    <a href="proveedores.html" class="btn-secundario">Cancelar</a>
+                </div>
+            </form>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
